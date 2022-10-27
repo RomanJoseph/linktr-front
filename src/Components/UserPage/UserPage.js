@@ -20,6 +20,7 @@ export default function UserPage() {
 	const [followed, setFollowed] = useState(false);
 	const [disabled, setDisabled] = useState(false);
 	const [more, setMore] = useState(true)
+	const [ref, setRef] = useState(false)
 
 
 	function hasMore(offset, item) {
@@ -28,75 +29,112 @@ export default function UserPage() {
 		}
 	}
 
+	function att(){
+		if(ref){
+			setRef(false)
+		}else{
+			setRef(true)
+		}	
+	}
+
 	function loadData() {
-		const promise2 = getLikes();
-		const promise3 = isFollowed(id);
-		let likes = [];
-		let postsLike = [];
-		let postsNoLike = [];
 		const offset = posts.length
-
-		promise3
-			.then((res) => res.data ? setFollowed(true) : setFollowed(false))
-			.catch((err) => console.log('follows not available'));
-
-		promise2
-			.then((res) => {
-				likes = res.data;
-			})
-			.catch((err) => console.log('likes not available'));
-
-		function fetchData() {
-			const promise1 = getUserPosts(id, offset);
+		const promise1 = getUserPosts(id, offset)
 			promise1
 				.then((res) => {
-					postsNoLike = res.data;
-
-					if (likes.length !== 0) {
-						for (let i = 0; i < postsNoLike.length; i++) {
-							for (let j = 0; j < likes.length; j++) {
-								if (postsNoLike[i].id === likes[j].postId) {
-									const newItem = { ...postsNoLike[i], liked: true };
-									postsLike.push(newItem);
-									break;
-								}
-
-								if (j === likes.length - 1) {
-									const newItem = { ...postsNoLike[i], liked: false };
-									postsLike.push(newItem);
-								}
-							}
-						}
-					} else {
-						for (let i = 0; i < postsNoLike.length; i++) {
-							const newItem = { ...postsNoLike[i], liked: false };
-							postsLike.push(newItem);
-						}
-					}
 					hasMore(offset, res.data)
-					setPosts([...posts, ...postsLike]);
-					if (res.data[0].link === null) {
-						setMessage("This user haven't any posts at moment");
-					} else {
-						setHasPost(true);
+					setPosts([...posts, ...res.data	]);
+					if(image === '' && name === ''){
+						setName(res.data[0].name);
+						setImage(res.data[0].image)
 					}
-					setName(res.data[0].name);
-					setImage(res.data[0].image)
+					
+					if (posts.length < 1) {
+						setMessage('There are no post yet');
+					}
+					att()
 				})
 				.catch((err) => {
 					setMessage(
 						'An error occured while trying to fetch the posts, please refresh the page'
 					);
 				});
-		}
-		setTimeout(fetchData, 300);
 	}
+
+	// function loadData() {
+	// 	const promise2 = getLikes();
+	// 	const promise3 = isFollowed(id);
+	// 	let likes = [];
+	// 	let postsLike = [];
+	// 	let postsNoLike = [];
+	// 	const offset = posts.length
+
+	// 	promise3
+	// 		.then((res) => res.data ? setFollowed(true) : setFollowed(false))
+	// 		.catch((err) => console.log('follows not available'));
+
+	// 	promise2
+	// 		.then((res) => {
+	// 			likes = res.data;
+	// 		})
+	// 		.catch((err) => console.log('likes not available'));
+
+	// 	function fetchData() {
+	// 		const promise1 = getUserPosts(id, offset);
+	// 		promise1
+	// 			.then((res) => {
+	// 				postsNoLike = res.data;
+
+	// 				if (likes.length !== 0) {
+	// 					for (let i = 0; i < postsNoLike.length; i++) {
+	// 						for (let j = 0; j < likes.length; j++) {
+	// 							if (postsNoLike[i].id === likes[j].postId) {
+	// 								const newItem = { ...postsNoLike[i], liked: true };
+	// 								postsLike.push(newItem);
+	// 								break;
+	// 							}
+
+	// 							if (j === likes.length - 1) {
+	// 								const newItem = { ...postsNoLike[i], liked: false };
+	// 								postsLike.push(newItem);
+	// 							}
+	// 						}
+	// 					}
+	// 				} else {
+	// 					for (let i = 0; i < postsNoLike.length; i++) {
+	// 						const newItem = { ...postsNoLike[i], liked: false };
+	// 						postsLike.push(newItem);
+	// 					}
+	// 				}
+	// 				hasMore(offset, res.data)
+	// 				setPosts([...posts, ...postsLike]);
+	// 				if (res.data[0].link === null) {
+	// 					setMessage("This user haven't any posts at moment");
+	// 				} else {
+	// 					setHasPost(true);
+	// 				}
+	// 				setName(res.data[0].name);
+	// 				setImage(res.data[0].image)
+	// 			})
+	// 			.catch((err) => {
+	// 				setMessage(
+	// 					'An error occured while trying to fetch the posts, please refresh the page'
+	// 				);
+	// 			});
+	// 	}
+	// 	setTimeout(fetchData, 300);
+	// }
 
 	useEffect(() => {
 		const promise2 = getLikes();
+		const promise3 = isFollowed(id);
 		let likes = [];
 		let postsLike = [];
 		let postsNoLike = [];
+
+		promise3
+			.then((res) => res.data ? setFollowed(true) : setFollowed(false))
+			.catch((err) => console.log('follows not available'));
 
 		promise2
 			.then((res) => {
@@ -128,11 +166,17 @@ export default function UserPage() {
 					postsLike.push(newItem);
 				}
 			}
-
+			setPosts([...posts, ...postsLike]);
+			if (posts.length === 0) {
+				setMessage("This user haven't any posts at moment");
+			} else {
+				setHasPost(true);
+			}
 		setPosts(postsLike);
+		
 		}
 		setTimeout(fetchData, 300);
-	}, [id, rerender]);
+	}, [id, rerender, ref]);
 
 	async function toFollow () {
 		setDisabled(true);

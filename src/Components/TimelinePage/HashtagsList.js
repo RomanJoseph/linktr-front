@@ -9,7 +9,7 @@ function Hashtag({name}){
 
     return(
         <li onClick={() => {navigate(`/hashtag/${params}`)
-        window.location.reload()}}>{name}</li>
+        }}>{name}</li>
     )
 }
 
@@ -26,7 +26,7 @@ export default function HashtagList(){
         }
     }
 
-    setInterval(refreshList, 60000)
+    const interval = setInterval(refreshList, 60000)
 
     useEffect(() => {
 
@@ -36,6 +36,7 @@ export default function HashtagList(){
         })
 
         promise.catch(err =>{
+            clearInterval(interval)
         })
     }, [switchRefresh])
 

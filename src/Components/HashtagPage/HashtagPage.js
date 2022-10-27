@@ -13,6 +13,7 @@ export default function HashTagPage(){
 	const [rerender, setRerender] = useState(false);
     const [isHashtag, setIsHashtag] = useState()
 	const [more, setMore] = useState(true)
+	const [ref, setRef] = useState(false)
 
 	function hasMore(offset, item) {
 		if(offset !== 0 && item.length === 0){
@@ -22,59 +23,82 @@ export default function HashTagPage(){
 	}
 
 	function loadData() {
-		const promise2 = getLikes();
-		let likes = [];
-		let postsLike = [];
-		let postsNoLike = [];
 		const offset = posts.length
-
-		promise2
+		const promise1 = getHashtagPost(hashtag, offset);
+		promise1
 			.then((res) => {
-				likes = res.data;
+				hasMore(offset, res.data)
+				setPosts([...posts, ...res.data	]);
+				if (posts.length < 1) {
+					setMessage('There are no post yet');
+				}
+				if(ref){
+					setRef(false)
+				}else{
+					setRef(true)
+				}	
 			})
-			.catch((err) => console.log('likes not available'));
-
-		function fetchData() {
-			const promise1 = getHashtagPost(hashtag, offset);
-			promise1
-				.then((res) => {
-					postsNoLike = res.data;
-
-					if (likes.length !== 0) {
-						for (let i = 0; i < postsNoLike.length; i++) {
-							for (let j = 0; j < likes.length; j++) {
-								if (postsNoLike[i].id === likes[j].postId) {
-									const newItem = { ...postsNoLike[i], liked: true };
-									postsLike.push(newItem);
-									break;
-								}
-
-								if (j === likes.length - 1) {
-									const newItem = { ...postsNoLike[i], liked: false };
-									postsLike.push(newItem);
-								}
-							}
-						}
-					} else {
-						for (let i = 0; i < postsNoLike.length; i++) {
-							const newItem = { ...postsNoLike[i], liked: false };
-							postsLike.push(newItem);
-						}
-					}
-					hasMore(offset, res.data)
-					setPosts([...posts, ...postsLike]);
-					if (posts.length < 1) {
-						setMessage('There are no post yet');
-					}
-				})
-				.catch((err) => {
-					setMessage(
-						'An error occured while trying to fetch the posts, please refresh the page'
-					);
-				});
-		}
-		setTimeout(fetchData, 300);
+			.catch((err) => {
+				setMessage(
+					'An error occured while trying to fetch the posts, please refresh the page'
+				);
+			});
 	}
+
+	// function loadData() {
+	// 	const promise2 = getLikes();
+	// 	let likes = [];
+	// 	let postsLike = [];
+	// 	let postsNoLike = [];
+	// 	const offset = posts.length
+
+	// 	promise2
+	// 		.then((res) => {
+	// 			likes = res.data;
+	// 		})
+	// 		.catch((err) => console.log('likes not available'));
+
+	// 	function fetchData() {
+	// 		const promise1 = getHashtagPost(hashtag, offset);
+	// 		promise1
+	// 			.then((res) => {
+	// 				postsNoLike = res.data;
+
+	// 				if (likes.length !== 0) {
+	// 					for (let i = 0; i < postsNoLike.length; i++) {
+	// 						for (let j = 0; j < likes.length; j++) {
+	// 							if (postsNoLike[i].id === likes[j].postId) {
+	// 								const newItem = { ...postsNoLike[i], liked: true };
+	// 								postsLike.push(newItem);
+	// 								break;
+	// 							}
+
+	// 							if (j === likes.length - 1) {
+	// 								const newItem = { ...postsNoLike[i], liked: false };
+	// 								postsLike.push(newItem);
+	// 							}
+	// 						}
+	// 					}
+	// 				} else {
+	// 					for (let i = 0; i < postsNoLike.length; i++) {
+	// 						const newItem = { ...postsNoLike[i], liked: false };
+	// 						postsLike.push(newItem);
+	// 					}
+	// 				}
+	// 				hasMore(offset, res.data)
+	// 				setPosts([...posts, ...postsLike]);
+	// 				if (posts.length < 1) {
+	// 					setMessage('There are no post yet');
+	// 				}
+	// 			})
+	// 			.catch((err) => {
+	// 				setMessage(
+	// 					'An error occured while trying to fetch the posts, please refresh the page'
+	// 				);
+	// 			});
+	// 	}
+	// 	setTimeout(fetchData, 300);
+	// }
 	
 	useEffect(() => {
 		const promise2 = getLikes();
@@ -86,6 +110,7 @@ export default function HashTagPage(){
             setIsHashtag(hashtag)
             setPosts([])
             setMessage('Loading...')
+			setMore(true)
             
         }
 
@@ -127,7 +152,7 @@ export default function HashTagPage(){
 			
 	}
 		setTimeout(fetchData, 300);
-	}, [rerender, hashtag]);
+	}, [rerender, hashtag, ref]);
 
 	return (
 		<>
