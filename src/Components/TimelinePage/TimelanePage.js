@@ -61,6 +61,9 @@ export default function TimelinePage() {
 							postsLike.push(newItem);
 						}
 					}
+					console.log(offset)
+					console.log(more)
+					console.log(res.data.length)
 					hasMore(offset, res.data)
 					setPosts([...posts, ...postsLike]);
 					if (posts.length < 1) {
