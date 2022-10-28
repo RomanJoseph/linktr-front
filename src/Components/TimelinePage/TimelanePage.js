@@ -148,7 +148,7 @@ const Container = styled.div`
 	margin-top: 125px;
 
 	.content {
-		width: 611px;
+		width: 65vw;
 	}
 
 	h1 {

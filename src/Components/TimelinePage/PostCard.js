@@ -137,7 +137,7 @@ export default function PostCard({
 						isLoading={isLoading}
 					/>
 				)}
-				<span className="leftSide">
+				<span className="leftSide" style={showConfirmScreen ? {display:'none'}:{}}>
 					<img
 						src={userImg}
 						alt="profile-img"
@@ -157,7 +157,7 @@ export default function PostCard({
 					/>
 				</span>
 
-				<span className="infos">
+				<span className="infos" style={showConfirmScreen ? {display:'none'}:{}}>
 					<div className="firstLine">
 						<h4 onClick={() => navigate(`/user/${userId}`)}>{name}</h4>
 
@@ -224,7 +224,6 @@ export default function PostCard({
 
 const Wrapper = styled.section`
 	margin-bottom: 32px;
-	display: flex;
 	flex-direction: column;
 `;
 

@@ -60,7 +60,7 @@ const OpacityBackground = styled.div`
     top: 0;
     left: 0;
     z-index: 9;
-`;  
+`;
 
 const Text = styled.span`
     font-weight: 700;

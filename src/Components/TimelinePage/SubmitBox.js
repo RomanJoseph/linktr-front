@@ -82,7 +82,7 @@ export default function SubmitBox({ setPosts, posts, setMessage, rerender, setRe
 }
 
 const BoxStyle = styled.div`
-	width: 611px;
+	width: 65vw;
 	height: 209px;
 	background-color: #ffffff;
 	border-radius: 16px;
